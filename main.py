@@ -1,13 +1,10 @@
-from flask import Flask, request, render_template, jsonify
-import openai
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
+import openai
+from flask import Flask, request, render_template, jsonify
 
 app = Flask(__name__)
 
-# Cài đặt API key
+# Không cần load_dotenv() khi chạy trên Railway
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/")
