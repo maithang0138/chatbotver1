@@ -17,7 +17,7 @@ def ask():
 
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "Bạn là trợ lý AI thân thiện."},
                 {"role": "user", "content": message}
