@@ -1,2 +1,2 @@
-chainlit>=0.7.0
+chainlit==0.7.2
 openai
