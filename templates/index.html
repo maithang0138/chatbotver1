@@ -2,89 +2,122 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Tin học cùng thầy Thắng</title>
+  <title>Chatbot Thầy Thắng - Light Mode</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* (CSS đã được giữ nguyên từ đầu vào của người dùng) */
     :root {
-      --bg-color: #f9f9f9;
-      --bot-color: #e0e0e0;
-      --user-color: #cfe2ff;
-      --text-color: #222;
-      --accent-color: #1976d2;
+      --bg: #f9f9f9;
+      --sidebar: #ffffff;
+      --text: #222;
+      --accent: #1976d2;
+      --bubble-user: #e3f2fd;
+      --bubble-bot: #eeeeee;
     }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-family: 'Roboto', sans-serif;
     }
+
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      display: flex;
       height: 100vh;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 240px;
+      background-color: var(--sidebar);
+      padding: 1rem;
+      border-right: 1px solid #ccc;
+    }
+
+    .sidebar h2 {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 0.4rem;
+    }
+
+    .info {
+      background-color: #e0e0e0;
+      padding: 0.6rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .main {
+      flex: 1;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
-    .topbar {
-      width: 100%;
-      background-color: #ffffff;
-      padding: 0.75rem 1.2rem;
+
+    .center-welcome {
+      flex: 1;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      border-bottom: 1px solid #ddd;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      justify-content: center;
+      transition: all 0.6s ease;
     }
-    .topbar h1 {
-      font-size: 1.2rem;
-      font-weight: 600;
+
+    .center-welcome.hide {
+      transform: translateY(-50px) scale(0.6);
+      opacity: 0;
+      pointer-events: none;
     }
-    .chip {
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      background-color: #ececec;
-      color: #444;
-      border-radius: 20px;
-      border: 1px solid #ccc;
+
+    .center-welcome h1 {
+      font-size: 2rem;
+      color: var(--accent);
     }
+
     #chatbox {
       flex: 1;
       overflow-y: auto;
       padding: 1rem 2rem;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
+
     .bubble {
       padding: 0.9rem 1.2rem;
       border-radius: 20px;
-      max-width: 80%;
+      max-width: 70%;
       line-height: 1.5;
       word-wrap: break-word;
       animation: fadeIn 0.3s ease;
     }
+
     .user {
       align-self: flex-end;
-      background-color: var(--user-color);
-      border-bottom-right-radius: 4px;
+      background-color: var(--bubble-user);
     }
+
     .bot {
       align-self: flex-start;
-      background-color: var(--bot-color);
-      border-bottom-left-radius: 4px;
+      background-color: var(--bubble-bot);
     }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
     .input-container {
       display: flex;
       padding: 1rem 2rem;
-      border-top: 1px solid #ddd;
-      gap: 0.8rem;
-      background-color: #fafafa;
+      border-top: 1px solid #ccc;
+      background-color: #fff;
     }
+
     input[type="text"] {
       flex: 1;
       padding: 1rem 1.2rem;
@@ -95,61 +128,134 @@
       font-size: 1rem;
       outline: none;
     }
+
     button {
-      background-color: var(--accent-color);
+      background-color: var(--accent);
       border: none;
-      border-radius: 50%;
-      width: 52px;
-      height: 52px;
+      border-radius: 30px;
+      padding: 0.8rem 1.4rem;
       color: white;
-      font-size: 1.3rem;
+      font-size: 1rem;
       cursor: pointer;
-      transition: background 0.2s ease-in-out;
+      margin-left: 0.6rem;
+      white-space: nowrap;
     }
-    button:hover {
-      background-color: #1565c0;
+
+    /* MODAL FIXED */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
     }
-    @media (max-width: 768px) {
-      #chatbox,
-      .input-container {
-        padding: 1rem;
-      }
+
+    .modal-content {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      width: 320px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .modal-content h2 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .modal-content input {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .modal-buttons button {
+      flex: 1;
     }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <h1>Tin học cùng thầy Thắng</h1>
-    <div class="chip">Chatbot version 1.0</div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Học sinh:</h2>
+    <div class="info" id="studentName">Chưa nhập</div>
+    <h2>Lớp:</h2>
+    <div class="info" id="studentClass">Chưa nhập</div>
   </div>
-  <div id="chatbox"></div>
-  <div class="input-container">
-    <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="handleKey(event)">
-    <button onclick="sendMessage()">➤</button>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="center-welcome" id="welcomeBox">
+      <h1>Tin học cùng thầy Thắng</h1>
+    </div>
+
+    <div id="chatbox"></div>
+
+    <div class="input-container">
+      <input type="text" id="userInput" placeholder="Nhập tin nhắn..." onkeydown="handleKey(event)">
+      <button onclick="sendMessage()">➤</button>
+    </div>
   </div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2>Nhập thông tin học sinh</h2>
+      <input type="text" id="inputName" placeholder="Tên học sinh..." />
+      <input type="text" id="inputClass" placeholder="Lớp học..." />
+      <div class="modal-buttons">
+        <button onclick="startChat()">Bắt đầu</button>
+        <button onclick="history.back()">Quay lại</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    async function sendMessage() {
+    function startChat() {
+      const name = document.getElementById("inputName").value.trim();
+      const cls = document.getElementById("inputClass").value.trim();
+      if (!name || !cls) {
+        alert("Vui lòng nhập đầy đủ họ tên và lớp.");
+        return;
+      }
+
+      document.getElementById("studentName").innerText = name;
+      document.getElementById("studentClass").innerText = cls;
+      document.getElementById("modal").style.display = "none";
+    }
+
+    function sendMessage() {
       const input = document.getElementById("userInput");
       const message = input.value.trim();
       if (!message) return;
+
+      const welcome = document.getElementById("welcomeBox");
+      if (!welcome.classList.contains("hide")) {
+        welcome.classList.add("hide");
+      }
+
       appendMessage("user", message);
       input.value = "";
-      try {
-        const response = await fetch("/ask", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message })
-        });
-        const data = await response.json();
-        if (data.reply) {
-          appendMessage("bot", data.reply);
-        } else {
-          appendMessage("bot", `Lỗi: ${data.error || "Không thể xử lý."}`);
-        }
-      } catch (error) {
-        appendMessage("bot", "Lỗi kết nối máy chủ.");
-      }
+
+      // giả lập bot phản hồi
+      setTimeout(() => {
+        appendMessage("bot", "Lỗi kết nối!");
+      }, 600);
     }
+
     function appendMessage(sender, text) {
       const chatbox = document.getElementById("chatbox");
       const message = document.createElement("div");
@@ -158,6 +264,7 @@
       chatbox.appendChild(message);
       chatbox.scrollTop = chatbox.scrollHeight;
     }
+
     function handleKey(e) {
       if (e.key === "Enter") sendMessage();
     }
