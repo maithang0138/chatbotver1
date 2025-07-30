@@ -1,32 +1,23 @@
-import os
+import chainlit as cl
 import openai
-from flask import Flask, request, render_template, jsonify
+import os
 
-app = Flask(__name__)
-
-# Không cần load_dotenv() khi chạy trên Railway
+# Lấy API key từ biến môi trường Railway
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-@app.route("/ask", methods=["POST"])
-def ask():
-    user_message = request.json.get("message", "")
-    if not user_message:
-        return jsonify({"error": "Empty message"}), 400
-
+@cl.on_message
+async def main(message: cl.Message):
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Bạn là trợ lý AI thân thiện."},
-                {"role": "user", "content": user_message}
+                {"role": "user", "content": message.content}
             ]
         )
-        reply = response['choices'][0]['message']['content'].strip()
-        return jsonify({"reply": reply})
+
+        reply = response.choices[0].message.content.strip()
+        await cl.Message(content=reply).send()
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        await cl.Message(content=f"❌ Lỗi: {e}").send()
